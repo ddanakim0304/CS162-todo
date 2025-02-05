@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -28,9 +29,11 @@ class Task(db.Model):
     content = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False)
     collapsed = db.Column(db.Boolean, default=False)
+    level = db.Column(db.Integer, default=1)  # 1: top-level, 2: sub-task, 3: sub-sub-task
     parent_id = db.Column(db.Integer, db.ForeignKey('task.id'))
     list_id = db.Column(db.Integer, db.ForeignKey('list.id'), nullable=False)
     children = db.relationship('Task', backref=db.backref('parent', remote_side=[id]))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -92,7 +95,24 @@ def add_task():
     content = request.form['content']
     list_id = request.form['list_id']
     parent_id = request.form.get('parent_id')
-    new_task = Task(content=content, list_id=list_id, parent_id=parent_id)
+    
+    # Determine task level
+    level = 1
+    if parent_id:
+        parent_task = Task.query.get_or_404(parent_id)
+        if parent_task.list.user_id != current_user.id:
+            return redirect(url_for('index'))
+        level = parent_task.level + 1
+        if level > 3:  # Prevent creation of tasks beyond level 3
+            flash('Cannot create tasks beyond 3 levels deep')
+            return redirect(url_for('index'))
+    
+    new_task = Task(
+        content=content,
+        list_id=list_id,
+        parent_id=parent_id,
+        level=level
+    )
     db.session.add(new_task)
     db.session.commit()
     return redirect(url_for('index'))
@@ -124,6 +144,30 @@ def move_task():
     new_list = List.query.get_or_404(new_list_id)
     if task.list.user_id == current_user.id and new_list.user_id == current_user.id:
         task.list_id = new_list_id
+        db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/delete_task/<int:task_id>')
+@login_required
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.list.user_id == current_user.id:
+        # Recursively delete all child tasks
+        def delete_children(task):
+            for child in task.children:
+                delete_children(child)
+                db.session.delete(child)
+        delete_children(task)
+        db.session.delete(task)
+        db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/edit_task/<int:task_id>', methods=['POST'])
+@login_required
+def edit_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.list.user_id == current_user.id:
+        task.content = request.form['content']
         db.session.commit()
     return redirect(url_for('index'))
 
