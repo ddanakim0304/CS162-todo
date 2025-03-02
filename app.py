@@ -122,7 +122,13 @@ def add_task():
 def complete_task(task_id):
     task = Task.query.get_or_404(task_id)
     if task.list.user_id == current_user.id:
-        task.completed = True
+        # Recursively delete all child tasks
+        def delete_children(task):
+            for child in task.children:
+                delete_children(child)
+                db.session.delete(child)
+        delete_children(task)
+        db.session.delete(task)
         db.session.commit()
     return redirect(url_for('index'))
 
