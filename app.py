@@ -102,6 +102,29 @@ def add_list():
     db.session.commit()
     return redirect(url_for('index'))
 
+# Route to delete a list
+@app.route('/delete_list/<int:list_id>', methods=['POST'])
+@login_required
+def delete_list(list_id):
+    list_to_delete = List.query.get_or_404(list_id)
+    if list_to_delete.user_id == current_user.id:
+        # Delete all tasks associated with the list
+        for task in list_to_delete.tasks:
+            delete_children(task)
+            db.session.delete(task)
+        db.session.delete(list_to_delete)
+        db.session.commit()
+        flash('List deleted successfully')
+    else:
+        flash('You do not have permission to delete this list.')
+    return redirect(url_for('index'))
+
+def delete_children(task):
+    for child in task.children:
+        delete_children(child)
+        db.session.delete(child)
+
+
 # Route to add a new task
 @app.route('/add_task', methods=['POST'])
 @login_required
