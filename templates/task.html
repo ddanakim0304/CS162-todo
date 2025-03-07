@@ -2,18 +2,22 @@
 {% block content %}
     <h1>Welcome, {{ current_user.username }}</h1>
     <h2>Your Lists</h2>
+    <!-- Form to add a new list -->
     <form action="{{ url_for('add_list') }}" method="post">
         <input type="text" name="name" required>
         <button type="submit">Add List</button>
     </form>
+    <!-- Loop through each list -->
     {% for list in lists %}
         <h3>{{ list.name }}</h3>
+        <!-- Form to add a new task to the list -->
         <form action="{{ url_for('add_task') }}" method="post">
             <input type="text" name="content" required>
             <input type="hidden" name="list_id" value="{{ list.id }}">
             <button type="submit">Add Task</button>
         </form>
         <ul>
+            <!-- Loop through tasks in the list that don't have a parent (top-level tasks) -->
             {% for task in list.tasks if not task.parent %}
                 {% include 'task.html' %}
             {% endfor %}

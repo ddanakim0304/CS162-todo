@@ -3,8 +3,10 @@
 {% block title %}Login - Todo App{% endblock %}
 
 {% block content %}
+<!-- Container for the login form -->
 <div class="auth-container">
     <h2 class="text-center mb-4">Login</h2>
+    <!-- Login form -->
     <form method="POST">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
@@ -18,6 +20,7 @@
             <button type="submit" class="btn btn-primary">Login</button>
         </div>
     </form>
+    <!-- Link to the registration page -->
     <div class="text-center mt-3">
         <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
     </div>

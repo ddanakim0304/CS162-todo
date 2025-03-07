@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Todo App{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* CSS variables for consistent theming */
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #f5f6fa;
@@ -19,11 +21,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* Navbar styles */
         .navbar {
             background-color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
+        /* Card styles for a clean look */
         .card {
             border: none;
             border-radius: 10px;
@@ -31,12 +35,14 @@
             margin-bottom: 1rem;
         }
 
+        /* List card styles */
         .list-card {
             background-color: white;
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
 
+        /* Task item styles */
         .task-item {
             background-color: white;
             border-radius: 8px;
@@ -46,16 +52,19 @@
             transition: all 0.3s ease;
         }
 
+        /* Hover effect for task items */
         .task-item:hover {
             transform: translateX(5px);
         }
 
+        /* Completed task styles */
         .task-item.completed {
             border-left-color: var(--accent-color);
             opacity: 0.7;
             text-decoration: line-through;
         }
 
+        /* Indentation levels for subtasks */
         .task-item.level-1 {
             margin-left: 0;
         }
@@ -70,50 +79,60 @@
             border-left-color: var(--danger-color);
         }
 
+        /* Task content styles */
         .task-content {
             cursor: pointer;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
         }
 
+        /* Hover effect for task content */
         .task-content:hover {
             background-color: var(--secondary-color);
         }
 
+        /* Edit form styles */
         .edit-form {
             flex-grow: 1;
             margin: 0 0.5rem;
         }
 
+        /* Button styles in button groups */
         .btn-group .btn {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
         }
 
+        /* Subtasks container styles */
         .subtasks {
             margin-top: 0.5rem;
         }
 
+        /* Primary button styles */
         .btn-primary {
             background-color: var(--primary-color);
             border: none;
         }
 
+        /* Success button styles */
         .btn-success {
             background-color: var(--accent-color);
             border: none;
         }
 
+        /* Danger button styles */
         .btn-danger {
             background-color: var(--danger-color);
             border: none;
         }
 
+        /* Collapse button styles */
         .collapse-btn {
             cursor: pointer;
             color: var(--primary-color);
         }
 
+        /* Add task form styles */
         .add-task-form {
             background-color: white;
             padding: 1rem;
@@ -121,10 +140,12 @@
             margin-bottom: 1rem;
         }
 
+        /* Flash messages styles */
         .flash-messages {
             margin-top: 1rem;
         }
 
+        /* Authentication container styles */
         .auth-container {
             max-width: 400px;
             margin: 2rem auto;
@@ -136,6 +157,7 @@
     </style>
 </head>
 <body>
+    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
@@ -146,6 +168,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <!-- Display login/logout based on authentication status -->
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <span class="nav-link">Welcome, {{ current_user.username }}!</span>
@@ -166,7 +189,9 @@
         </div>
     </nav>
 
+    <!-- Main content container -->
     <div class="container mt-4">
+        <!-- Flash messages display -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <div class="flash-messages">
@@ -180,9 +205,11 @@
             {% endif %}
         {% endwith %}
         
+        <!-- Content block for child templates -->
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
