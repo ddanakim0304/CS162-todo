@@ -2,7 +2,7 @@
 
 ## Demo
 
-[Demo Vidoe](https://www.loom.com/share/18e25546fe854ce8a474a53fd523203b?sid=f5fadb2c-5401-4b05-ad04-addaf2156bb1)
+[Demo Video](https://www.loom.com/share/18e25546fe854ce8a474a53fd523203b?sid=f5fadb2c-5401-4b05-ad04-addaf2156bb1)
 
 
 ## Overview
