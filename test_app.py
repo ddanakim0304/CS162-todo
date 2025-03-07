@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 import os
 
 class TodoAppTestCase(unittest.TestCase):
+    # Set up test environment before each test
     def setUp(self):
         """Set up test environment before each test"""
         app.config['TESTING'] = True
@@ -19,12 +20,14 @@ class TodoAppTestCase(unittest.TestCase):
             db.session.add_all([user1, user2])
             db.session.commit()
 
+    # Clean up after each test
     def tearDown(self):
         """Clean up after each test"""
         with app.app_context():
             db.session.remove()
             db.drop_all()
 
+    # Helper function to log in
     def login(self, username, password):
         """Helper function to log in"""
         return self.app.post('/login', data=dict(
@@ -32,16 +35,19 @@ class TodoAppTestCase(unittest.TestCase):
             password=password
         ), follow_redirects=True)
 
+    # Helper function to log out
     def logout(self):
         """Helper function to log out"""
         return self.app.get('/logout', follow_redirects=True)
 
+    # Helper function to create a list
     def create_list(self, name):
         """Helper function to create a list"""
         return self.app.post('/add_list', data=dict(
             name=name
         ), follow_redirects=True)
 
+    # Helper function to create a task
     def create_task(self, content, list_id, parent_id=None):
         """Helper function to create a task"""
         data = dict(
@@ -52,6 +58,7 @@ class TodoAppTestCase(unittest.TestCase):
             data['parent_id'] = parent_id
         return self.app.post('/add_task', data=data, follow_redirects=True)
 
+    # Test that users can only see their own tasks
     def test_user_isolation(self):
         """Test that users can only see their own tasks"""
         # Login as user1
@@ -77,6 +84,7 @@ class TodoAppTestCase(unittest.TestCase):
         self.assertNotIn(b'User1 List', response.data)
         self.assertNotIn(b'User1 Task', response.data)
 
+    # Test that users cannot modify other user's tasks
     def test_user_permissions(self):
         """Test that users cannot modify other user's tasks"""
         # Login as user1 and create a task
@@ -100,6 +108,7 @@ class TodoAppTestCase(unittest.TestCase):
             task = Task.query.get(task_id)
             self.assertIsNotNone(task)
 
+    # Test marking tasks as complete
     def test_task_completion(self):
         """Test marking tasks as complete"""
         self.login('testuser1', 'password1')
@@ -118,6 +127,7 @@ class TodoAppTestCase(unittest.TestCase):
             task = Task.query.get(task_id)
             self.assertIsNone(task)
 
+    # Test collapsing and expanding a task
     def test_task_collapse(self):
         """Test collapsing and expanding a task"""
         self.login('testuser1', 'password1')
@@ -137,6 +147,7 @@ class TodoAppTestCase(unittest.TestCase):
             task = Task.query.get(parent_id)
             self.assertTrue(task.collapsed)
 
+    # Test moving a top-level task to a different list
     def test_move_task(self):
         """Test moving a top-level task to a different list"""
         self.login('testuser1', 'password1')
@@ -160,6 +171,6 @@ class TodoAppTestCase(unittest.TestCase):
             task = Task.query.get(task_id)
             self.assertEqual(task.list_id, list_b_id)
 
-
+# Run the tests if the script is executed
 if __name__ == '__main__':
     unittest.main()

@@ -14,7 +14,8 @@ db = SQLAlchemy(app)
 
 # Initialize login manager for user authentication
 login_manager = LoginManager(app)
-login_manager.login_view = 'login'  # Redirects to login page if user is not authenticated
+# Redirects to login page if user is not authenticated
+login_manager.login_view = 'login'
 
 # User model representing registered users
 class User(UserMixin, db.Model):
